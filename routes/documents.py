@@ -4,7 +4,7 @@ from middleware.auth import verify_token
 
 documents_bp = Blueprint('documents', __name__)
 
-@documents_bp.route('/document/list', methods=['GET'])
+@documents_bp.route('/documents/list', methods=['GET'])
 @verify_token
 def list_documents(current_user):
     return documents.list_documents(current_user)

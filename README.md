@@ -127,6 +127,63 @@ Esta documentación actualizada asume que el endpoint ha sido modificado para ac
 - **GET /documents/list**
   Recupera una lista de documentos procesados.
 
+```json
+{
+  "documents": [
+    {
+      "id": "uuid_del_documento",
+      "filename": "archivo.pdf",
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_by": "uuid del admin que lo subio",
+      "fragments": 10
+    },
+    ...
+  ]
+}
+```
+- **POST /auth/login**
+  Inicia sesión en la aplicación.
+  **Cuerpo de la solicitud (JSON):**
+  ```json
+  {
+    "email": "correo@correo.com",
+    "password": "contraseña"
+  }
+  ```
+  **Respuesta:**
+  ```json
+  {
+    "userid": id del usuario,
+    "email": correo,
+    "role": rol,
+    "access_token": jwt access token,
+    "refresh_token": jwt refresh token,
+    "expires_at": tiempo de expiración del token,
+    "token_type": tipo de token (ej: Bearer)
+  }
+  ```
+
+- **POST /auth/signup**
+  Crea una cuenta en la aplicación.
+  **Cuerpo de la solicitud (JSON):**
+  ```json
+  {
+    "email": "correo@correo.com",
+    "password": "contraseña"
+  }
+  ```
+  **Respuesta:**
+  ```json
+  {
+    "userid": id del usuario,
+    "email": correo,
+    "role": rol,
+    "access_token": jwt access token,
+    "refresh_token": jwt refresh token,
+    "expires_at": tiempo de expiración del token,
+    "token_type": tipo de token (ej: Bearer)
+  }
+  ```
 ## Configuración de la Base de Datos
 
 ### Creación de la Base de Datos
