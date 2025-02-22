@@ -33,8 +33,8 @@ SynthECBE utiliza técnicas modernas de Procesamiento de Lenguaje Natural (NLP) 
 
 ### Requisitos Previos
 
-- Python 3.9 o superior
-- PostgreSQL 12 o superior (con la extensión vector instalada, por ejemplo [pgvector](https://github.com/pgvector/pgvector))
+- Python 3.11 o superior
+- PostgreSQL 12 o superior (con la extensión vector, y pg_trgm instaladas)
 - pip
 
 ### Clonar el Repositorio
