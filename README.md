@@ -86,7 +86,7 @@ Envía un documento PDF (o la ruta al archivo) al endpoint correspondiente. El s
 ## Endpoints de la API
 
 Esta documentación actualizada asume que el endpoint ha sido modificado para aceptar archivos a través de la clave `pdf_file` en lugar de un JSON con la clave `pdf_content`. Asegúrate de que el código de tu endpoint en Flask procese correctamente las peticiones de tipo `multipart/form-data` y extraiga el archivo enviado.
-- **POST /process_pdf**
+- **POST /documents/upload**
   Procesa un documento PDF y lo sube a la base de datos.
   **Parametros**
   - pdf_file (archivo):
@@ -98,7 +98,7 @@ Esta documentación actualizada asume que el endpoint ha sido modificado para ac
     -H "Content-Type: multipart/form-data" \
     -F "pdf_file=@/ruta/al/archivo.pdf"
   ```
-- **POST /semantic_search**
+- **POST /search**
   Realiza una búsqueda semántica en los documentos procesados.
   **Cuerpo de la solicitud (JSON):**
   ```json
@@ -124,7 +124,7 @@ Esta documentación actualizada asume que el endpoint ha sido modificado para ac
   }
   ```
 
-- **GET /documents**
+- **GET /documents/list**
   Recupera una lista de documentos procesados.
 
 ## Configuración de la Base de Datos

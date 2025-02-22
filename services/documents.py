@@ -26,13 +26,11 @@ def upload_pdf(current_user):
         }
 
         db.db.table('documents').insert(document_data).execute()
-        print(document_data)
 
         chunks = process_pdf(file.read())
 
         for idx, chunk in enumerate(chunks):
             embedding = lm.model.encode(chunk).tolist()
-            print(embedding)
             chunk_data = {
                 'document_id': document_id,
                 'chunk_index': idx,

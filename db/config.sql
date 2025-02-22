@@ -9,6 +9,9 @@ grant usage on schema extensions to public;
 -- Create the vector extension in the "extensions" schema
 create extension if not exists vector schema extensions;
 
+-- Create the fuzzy_search extension in the "extensions" schema
+create extension if not exists pg_trgm schema extensions;
+
 -- Set the search_path so that objects are created in public and extensions
 alter database postgres set search_path = public, extensions;
 
@@ -230,6 +233,33 @@ begin
 end;
 $$;
 
+create or replace function fuzzy_search_documents(search_query text, match_count int default 5)
+returns table(
+    id uuid,
+    filename text,
+    uploaded_by uuid,
+    created_at timestamp with time zone,
+    similarity real
+)
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+    return query
+    select
+        doc.id,
+        doc.filename,
+        doc.uploaded_by,
+        doc.created_at,
+        similarity(doc.filename, search_query) AS similarity
+    from public.documents doc
+    where doc.filename % search_query
+    order BY similarity DESC
+    limit match_count;
+end;
+$$;
+grant execute on all functions in schema public to authenticated;
 
 -- =============================================================================
 -- 5. Grant Permissions on Public Objects
@@ -239,4 +269,4 @@ grant select, insert, update, delete on public.admin_users to authenticated, ano
 grant select, insert, update, delete on public.documents to authenticated, anon;
 grant select, insert, update, delete on public.document_chunks to authenticated, anon;
 
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO authenticated;
+grant execute on all functions in schema public to authenticated;

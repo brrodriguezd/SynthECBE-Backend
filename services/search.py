@@ -1,16 +1,66 @@
-from flask import request, jsonify
+from flask import jsonify
 from instances import db, lm
 
-def semantic_search(current_user):
-    data = request.json
-    if not data or 'query' not in data:
-        return jsonify({'error': 'No search query provided'}), 400
-
+def search(current_user, query, threshold = 0.7, limit=5):
     try:
-        query_embedding = lm.model.encode(data['query']).tolist()
-        print(query_embedding)
-        threshold = data.get('threshold', 0.1)
-        limit = data.get('limit', 5)
+        results_normal = normal_search(current_user, query, limit)
+        results_semantic = semantic_search(current_user, query, threshold, limit)
+        results = merge_and_sort_results(results_normal, results_semantic)
+        return jsonify({
+            "results": results
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def merge_and_sort_results(fuzzy_results, semantic_results):
+    """
+    Merges fuzzy and semantic search results, removes duplicates based on document ID,
+    and sorts the final list in descending order by similarity.
+
+    Assumptions:
+      - fuzzy_results: list of dicts with key 'id' and 'similarity'
+      - semantic_results: list of dicts with key 'document_id' and 'similarity'
+
+    Duplicate documents (same document id) are determined by comparing fuzzy's 'id'
+    and semantic's 'document_id'. If a document appears in both, the one with the higher
+    similarity score is retained.
+    """
+    combined = {}
+
+    # Process fuzzy search results (using 'id' as the unique key)
+    for item in fuzzy_results:
+        doc_id = item.get("id")
+        if doc_id:
+            # Store item if it's the first time, or if its similarity is higher than an existing one
+            if doc_id not in combined or combined[doc_id]["similarity"] < item["similarity"]:
+                combined[doc_id] = item
+
+    # Process semantic search results (using 'document_id' as the unique key)
+    for item in semantic_results:
+        doc_id = item.get("document_id")
+        if doc_id:
+            # Use document_id as key and choose the one with the higher similarity
+            if doc_id not in combined or combined[doc_id]["similarity"] < item["similarity"]:
+                combined[doc_id] = item
+
+    # Convert the dictionary back to a list and sort by similarity (descending)
+    merged_list = list(combined.values())
+    merged_list.sort(key=lambda x: x["similarity"], reverse=True)
+    return merged_list
+def normal_search(current_user, query ,limit):
+    try:
+        response = db.db.rpc(
+                "fuzzy_search_documents",
+                {"search_query": query.upper(), "match_count": limit}
+            ).execute()
+        return response.data if response.data else []
+    except Exception as e:
+        raise e
+
+def semantic_search(current_user, query, threshold, limit):
+    try:
+        query_embedding = lm.model.encode(query).tolist()
 
         response = db.db.rpc(
             'search_documents',
@@ -21,7 +71,7 @@ def semantic_search(current_user):
             }
         ).execute()
 
-        return jsonify({'results': response.data})
+        return response.data if response.data else []
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        raise e

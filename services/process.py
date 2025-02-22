@@ -17,10 +17,10 @@ def process_pdf(pdf_content: str | Path) -> List[str]:
     reader = PdfReader(pdf_file)
     chunks = []
     for page in reader.pages:
-        text = page.extract_text()
-        if text:
-            # Split by double newlines and strip each paragraph
-            paragraphs = [para.strip() for para in text.split('\n\n') if para.strip()]
+        raw_text = page.extract_text()
+        if raw_text:
+            paragraphs = [para.strip() for para in raw_text.split('\n\n') if para.strip()]
+            # preprocces each paragraph
             chunks.extend(paragraphs)
     return chunks
 

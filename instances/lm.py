@@ -2,4 +2,4 @@ from sentence_transformers import SentenceTransformer
 
 # initialize language model
 
-model = SentenceTransformer("nomic-ai/nomic-embed-text-v2-moe", trust_remote_code=True)
+model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
