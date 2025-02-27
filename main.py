@@ -3,12 +3,21 @@ from dotenv import load_dotenv
 from routes.auth import auth_bp
 from routes.documents import documents_bp
 from routes.search import search_bp
+from flask_cors import CORS
 
 # load environment variables
 load_dotenv()
 
 #initialize app
 app = Flask(__name__)
+
+CORS(app, resources={
+    r"/*": {
+        "origins": "http://localhost:5173",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})  # This will enable CORS for all routes and allow all origins
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(documents_bp)
